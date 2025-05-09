@@ -18,11 +18,13 @@ class MyDemo(ShowBase):
         self.current_pose = "default"
         self.gesture_data = self.loadAllPoseData()
         self.loadSignPoses(self.current_pose)
+        self.pose_sequence = ["default", "hi", "a"]  # Example word
+        self.pose_index = 0
 
-        taskMgr.doMethodLater(5, self.animateToPose, "SwitchToNextPose")
+        taskMgr.doMethodLater(4, self.animateNextPose, "SwitchToNextPose")
 
     def setupCamera(self):
-        # self.disableMouse()
+        self.disableMouse()
         self.camera.setPos(0, -14, 3.25)
 
     def setupSkybox(self):
@@ -72,8 +74,6 @@ class MyDemo(ShowBase):
         self.lpinky1 = self.larm.find("**/p1")
         self.lpinky2 = self.larm.find("**/p2")
         self.lpinky3 = self.larm.find("**/p3")
-
-
 
     def setupLights(self):
         mainLight = DirectionalLight('main light')
@@ -141,15 +141,23 @@ class MyDemo(ShowBase):
             if "pinky" in f:
                 applyFingerPose([self.rpinky1, self.rpinky2, self.rpinky3], f["pinky"])
 
-    def animateToPose(self, task):
-        next_pose = "a" if self.current_pose == "default" else "default"
-        poses = self.gesture_data.get(next_pose)
 
-        if not poses:
+
+
+    def animateNextPose(self, task):
+        if self.pose_index >= len(self.pose_sequence):
+            self.pose_index = 0
             return Task.done
 
+        pose_name = self.pose_sequence[self.pose_index]
+        self.current_pose = pose_name
+        poses = self.gesture_data.get(pose_name)
+
+        if not poses:
+            self.pose_index += 1
+            return task.again
+
         sequence = []
-        # poseLen = len(poses) if isinstance(poses, list) else 1
         delay = 0.05
         time = delay
 
@@ -211,7 +219,7 @@ class MyDemo(ShowBase):
             })
 
         Sequence(*sequence).start()
-        self.current_pose = next_pose
+        self.pose_index = (self.pose_index + 1)%len(self.pose_sequence)
         return task.again
 
 demox = MyDemo()
