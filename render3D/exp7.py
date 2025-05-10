@@ -15,21 +15,22 @@ class MyDemo(ShowBase):
         self.setupCamera()
         self.setupSkybox()
 
-        self.current_pose = "default"
+        self.current_pose = "s"
         self.gesture_data = self.loadAllPoseData()
         self.loadSignPoses(self.current_pose)
-        self.pose_sequence = ["default", "hi", "a"]  # Example word
+        self.pose_sequence = ["hi", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s"]
+        # self.pose_sequence = ["j"]  # Example word
         self.pose_index = 0
 
-        taskMgr.doMethodLater(4, self.animateNextPose, "SwitchToNextPose")
+        # taskMgr.doMethodLater(4, self.animateNextPose, "SwitchToNextPose")
 
     def setupCamera(self):
-        self.disableMouse()
-        self.camera.setPos(0, -14, 3.25)
+        # self.disableMouse()
+        self.camera.setPos(0, -15, 3.25)
 
     def setupSkybox(self):
         skybox = loader.loadModel('skybox/skybox.egg')
-        skybox.setScale(500)
+        skybox.setScale(50)
         skybox.setBin('background', 1)
         skybox.setDepthWrite(0)
         skybox.setLightOff()
@@ -79,11 +80,11 @@ class MyDemo(ShowBase):
         mainLight = DirectionalLight('main light')
         mainLight.setShadowCaster(True)
         mainLightNodePath = render.attachNewNode(mainLight)
-        mainLightNodePath.setHpr(30, -60, 0)
+        mainLightNodePath.setHpr(0, -70, 0)
         render.setLight(mainLightNodePath)
 
         ambientLight = AmbientLight('ambient light')
-        ambientLight.setColor((0.3, 0.3, 0.3, 1))
+        ambientLight.setColor((0.2, 0.2, 0.2, 1))
         ambientLightNodePath = render.attachNewNode(ambientLight)
         render.setLight(ambientLightNodePath)
 
