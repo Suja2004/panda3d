@@ -15,84 +15,18 @@ class MyDemo(ShowBase):
         self.setupCamera()
         self.setupSkybox()
 
-        self.current_pose ="default"
+        self.current_pose = "default"
         self.gesture_data = self.loadAllPoseData()
         self.loadSignPoses(self.current_pose)
-        self.pose_sequence = ["hi", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-        # self.pose_sequence = ["z"]
+
+        # self.pose_sequence = ["hi", "hello", "sujan", "z"]
+        # self.pose_sequence = ["hi", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+        self.pose_sequence = ["j"]
+
+        self.expanded_sequence = self.expandPoseSequence(self.pose_sequence)
         self.pose_index = 0
 
-        taskMgr.doMethodLater(4, self.animateNextPose, "SwitchToNextPose")
-
-    def setupCamera(self):
-        self.disableMouse()
-        self.camera.setPos(0, -15, 3.25)
-
-    def setupSkybox(self):
-        skybox = loader.loadModel('skybox/skybox.egg')
-        skybox.setScale(50)
-        skybox.setBin('background', 1)
-        skybox.setDepthWrite(0)
-        skybox.setLightOff()
-        skybox.reparentTo(render)
-
-    def loadModels(self):
-        self.torso = loader.loadModel('character/torso.glb')
-        self.torso.setPos(0, 0, 0)
-        self.torso.reparentTo(render)
-
-        self.rarm = loader.loadModel('character/RArmX.glb')
-        self.rarm.reparentTo(self.torso)
-        self.rthumb1 = self.rarm.find("**/t1")
-        self.rthumb1.setColor(1, 0, 0, 1)
-        self.rthumb2 = self.rarm.find("**/t2")
-        self.rindex1 = self.rarm.find("**/i1")
-        self.rindex2 = self.rarm.find("**/i2")
-        self.rindex3 = self.rarm.find("**/i3")
-        self.rmiddle1 = self.rarm.find("**/m1")
-        self.rmiddle2 = self.rarm.find("**/m2")
-        self.rmiddle3 = self.rarm.find("**/m3")
-        self.rring1 = self.rarm.find("**/r1")
-        self.rring2 = self.rarm.find("**/r2")
-        self.rring3 = self.rarm.find("**/r3")
-        self.rpinky1 = self.rarm.find("**/p1")
-        self.rpinky2 = self.rarm.find("**/p2")
-        self.rpinky3 = self.rarm.find("**/p3")
-
-        self.larm = loader.loadModel('character/LArmX.glb')
-        self.larm.reparentTo(self.torso)
-        self.lthumb1 = self.larm.find("**/t1")
-        self.lthumb2 = self.larm.find("**/t2")
-        self.lindex1 = self.larm.find("**/i1")
-        self.lindex2 = self.larm.find("**/i2")
-        self.lindex3 = self.larm.find("**/i3")
-        self.lmiddle1 = self.larm.find("**/m1")
-        self.lmiddle2 = self.larm.find("**/m2")
-        self.lmiddle3 = self.larm.find("**/m3")
-        self.lring1 = self.larm.find("**/r1")
-        self.lring2 = self.larm.find("**/r2")
-        self.lring3 = self.larm.find("**/r3")
-        self.lpinky1 = self.larm.find("**/p1")
-        self.lpinky2 = self.larm.find("**/p2")
-        self.lpinky3 = self.larm.find("**/p3")
-
-    def setupLights(self):
-        mainLight = DirectionalLight('main light')
-        mainLight.setShadowCaster(True)
-        mainLightNodePath = render.attachNewNode(mainLight)
-        mainLightNodePath.setHpr(0, -70, 0)
-        render.setLight(mainLightNodePath)
-
-        ambientLight = AmbientLight('ambient light')
-        ambientLight.setColor((0.2, 0.2, 0.2, 1))
-        ambientLightNodePath = render.attachNewNode(ambientLight)
-        render.setLight(ambientLightNodePath)
-
-        render.setShaderAuto()
-
-    def loadAllPoseData(self):
-        with open("sign_poses.json", "r") as f:
-            return json.load(f)
+        taskMgr.doMethodLater(2, self.animateNextPose, "SwitchToNextPose")
 
     def loadSignPoses(self, name):
         poses = self.gesture_data.get(name)
@@ -142,15 +76,111 @@ class MyDemo(ShowBase):
             if "pinky" in f:
                 applyFingerPose([self.rpinky1, self.rpinky2, self.rpinky3], f["pinky"])
 
+    def expandPoseSequence(self, sequence):
+        result = []
+        for word in sequence:
+            if word in self.gesture_data:
+                result.append(word)
+            else:
+                for letter in word:
+                    if letter in self.gesture_data:
+                        result.append(letter)
+        return result
 
+    def setupCamera(self):
+        self.disableMouse()
+        self.camera.setPos(0, -15, 3.25)
 
+    def setupSkybox(self):
+        skybox = loader.loadModel('skybox/skybox.egg')
+        skybox.setScale(50)
+        skybox.setBin('background', 1)
+        skybox.setDepthWrite(0)
+        skybox.setLightOff()
+        skybox.reparentTo(render)
+
+    def loadModels(self):
+        self.torso = loader.loadModel('character/torso.glb')
+        self.torso.setPos(0, 0, 0)
+        self.torso.reparentTo(render)
+
+        self.rarm = loader.loadModel('character/RArmX.glb')
+        self.rarm.reparentTo(self.torso)
+        self.rthumb1 = self.rarm.find("**/t1")
+        self.rthumb2 = self.rarm.find("**/t2")
+        self.rindex1 = self.rarm.find("**/i1")
+        self.rindex2 = self.rarm.find("**/i2")
+        self.rindex3 = self.rarm.find("**/i3")
+        self.rmiddle1 = self.rarm.find("**/m1")
+        self.rmiddle2 = self.rarm.find("**/m2")
+        self.rmiddle3 = self.rarm.find("**/m3")
+        self.rring1 = self.rarm.find("**/r1")
+        self.rring2 = self.rarm.find("**/r2")
+        self.rring3 = self.rarm.find("**/r3")
+        self.rpinky1 = self.rarm.find("**/p1")
+        self.rpinky2 = self.rarm.find("**/p2")
+        self.rpinky3 = self.rarm.find("**/p3")
+
+        self.larm = loader.loadModel('character/LArmX.glb')
+        self.larm.reparentTo(self.torso)
+        self.lthumb1 = self.larm.find("**/t1")
+        self.lthumb2 = self.larm.find("**/t2")
+        self.lindex1 = self.larm.find("**/i1")
+        self.lindex2 = self.larm.find("**/i2")
+        self.lindex3 = self.larm.find("**/i3")
+        self.lmiddle1 = self.larm.find("**/m1")
+        self.lmiddle2 = self.larm.find("**/m2")
+        self.lmiddle3 = self.larm.find("**/m3")
+        self.lring1 = self.larm.find("**/r1")
+        self.lring2 = self.larm.find("**/r2")
+        self.lring3 = self.larm.find("**/r3")
+        self.lpinky1 = self.larm.find("**/p1")
+        self.lpinky2 = self.larm.find("**/p2")
+        self.lpinky3 = self.larm.find("**/p3")
+
+    def setupLights(self):
+        mainLight = DirectionalLight('main light')
+        mainLight.setShadowCaster(True)
+        mainLightNodePath = render.attachNewNode(mainLight)
+        mainLightNodePath.setHpr(0, -70, 0)
+        render.setLight(mainLightNodePath)
+
+        ambientLight = AmbientLight('ambient light')
+        ambientLight.setColor((0.2, 0.2, 0.2, 1))
+        ambientLightNodePath = render.attachNewNode(ambientLight)
+        render.setLight(ambientLightNodePath)
+        render.setShaderAuto()
+
+    def loadAllPoseData(self):
+        with open("sign_poses.json", "r") as f:
+            return json.load(f)
+
+    def slideArms(self):
+        slide_distance = 0.5
+        time = 0.2
+
+        sequence = Sequence(
+            LerpPosInterval(self.larm, time, self.larm.getPos()),
+            LerpPosInterval(self.rarm, time, self.rarm.getPos() + LVecBase3f(-slide_distance,0, 0)),
+            LerpPosInterval(self.larm, time, self.larm.getPos()),
+            LerpPosInterval(self.rarm, time, self.rarm.getPos())
+        )
+        sequence.start()
 
     def animateNextPose(self, task):
-        if self.pose_index >= len(self.pose_sequence):
+        if self.pose_index >= len(self.expanded_sequence):
+            self.loadSignPoses("default")
             self.pose_index = 0
             return Task.done
 
-        pose_name = self.pose_sequence[self.pose_index]
+        pose_name = self.expanded_sequence[self.pose_index]
+
+        # Check for same as previous
+        if self.current_pose == pose_name:
+            self.slideArms()
+            self.pose_index += 1
+            return task.again
+
         self.current_pose = pose_name
         poses = self.gesture_data.get(pose_name)
 
@@ -159,8 +189,7 @@ class MyDemo(ShowBase):
             return task.again
 
         sequence = []
-        delay = 0.05
-        time = delay
+        time = 0.05
 
         def addFingerLerp(hand_data, finger_map):
             if "fingers" not in hand_data:
@@ -168,49 +197,18 @@ class MyDemo(ShowBase):
             for name, parts in finger_map.items():
                 if name in hand_data["fingers"]:
                     for part, pose_data in zip(parts, hand_data["fingers"][name]):
-                        sequence.append(LerpPosInterval(part, time, LVecBase3f(*pose_data["pos"])))
-                        sequence.append(LerpHprInterval(part, time, LVecBase3f(*pose_data["hpr"])))
+                        sequence.append(LerpPosInterval(part, 0, LVecBase3f(*pose_data["pos"])))
+                        sequence.append(LerpHprInterval(part, 0, LVecBase3f(*pose_data["hpr"])))
 
-        if isinstance(poses, list):
-            for pose in poses:
-                l = pose["leftHand"]
-                r = pose["rightHand"]
-                sequence.extend([
-                    LerpPosInterval(self.larm, time, LVecBase3f(*l["pos"])),
-                    LerpHprInterval(self.larm, time, LVecBase3f(*l["hpr"])),
-                    LerpPosInterval(self.rarm, time, LVecBase3f(*r["pos"])),
-                    LerpHprInterval(self.rarm, time, LVecBase3f(*r["hpr"]))
-                ])
-                addFingerLerp(l, {
-                    "thumb": [self.lthumb1, self.lthumb2],
-                    "index": [self.lindex1, self.lindex2, self.lindex3],
-                    "middle": [self.lmiddle1, self.lmiddle2, self.lmiddle3],
-                    "ring": [self.lring1, self.lring2, self.lring3],
-                    "pinky": [self.lpinky1, self.lpinky2, self.lpinky3]
-                })
-                addFingerLerp(r, {
-                    "thumb": [self.rthumb1, self.rthumb2],
-                    "index": [self.rindex1, self.rindex2, self.rindex3],
-                    "middle": [self.rmiddle1, self.rmiddle2, self.rmiddle3],
-                    "ring": [self.rring1, self.rring2, self.rring3],
-                    "pinky": [self.rpinky1, self.rpinky2, self.rpinky3]
-                })
-        else:
-            l = poses["leftHand"]
-            r = poses["rightHand"]
+        def addHandAndFingers(pose):
+            l = pose["leftHand"]
+            r = pose["rightHand"]
             sequence.extend([
                 LerpPosInterval(self.larm, time, LVecBase3f(*l["pos"])),
                 LerpHprInterval(self.larm, time, LVecBase3f(*l["hpr"])),
                 LerpPosInterval(self.rarm, time, LVecBase3f(*r["pos"])),
                 LerpHprInterval(self.rarm, time, LVecBase3f(*r["hpr"]))
             ])
-            addFingerLerp(l, {
-                "thumb": [self.lthumb1, self.lthumb2],
-                "index": [self.lindex1, self.lindex2, self.lindex3],
-                "middle": [self.lmiddle1, self.lmiddle2, self.lmiddle3],
-                "ring": [self.lring1, self.lring2, self.lring3],
-                "pinky": [self.lpinky1, self.lpinky2, self.lpinky3]
-            })
             addFingerLerp(r, {
                 "thumb": [self.rthumb1, self.rthumb2],
                 "index": [self.rindex1, self.rindex2, self.rindex3],
@@ -218,10 +216,25 @@ class MyDemo(ShowBase):
                 "ring": [self.rring1, self.rring2, self.rring3],
                 "pinky": [self.rpinky1, self.rpinky2, self.rpinky3]
             })
+            addFingerLerp(l, {
+                "thumb": [self.lthumb1, self.lthumb2],
+                "index": [self.lindex1, self.lindex2, self.lindex3],
+                "middle": [self.lmiddle1, self.lmiddle2, self.lmiddle3],
+                "ring": [self.lring1, self.lring2, self.lring3],
+                "pinky": [self.lpinky1, self.lpinky2, self.lpinky3]
+            })
+
+
+        if isinstance(poses, list):
+            for pose in poses:
+                addHandAndFingers(pose)
+        else:
+            addHandAndFingers(poses)
 
         Sequence(*sequence).start()
-        self.pose_index = (self.pose_index + 1)%len(self.pose_sequence)
+        self.pose_index += 1
         return task.again
 
-demox = MyDemo()
-demox.run()
+
+app = MyDemo()
+app.run()
